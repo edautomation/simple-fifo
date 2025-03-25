@@ -1,3 +1,7 @@
+test/build/*
+test/out/*
+*/.vs/*
+
 # Prerequisites
 *.d
 
