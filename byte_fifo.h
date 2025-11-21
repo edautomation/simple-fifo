@@ -18,6 +18,11 @@
 #ifndef BYTE_FIFO_H_
 #define BYTE_FIFO_H_
 
+#include <stdint.h>
+
+#define BYTE_FIFO_NULLPTR -1
+#define BYTE_FIFO_INVALID_PARAM -2
+
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
@@ -44,11 +49,11 @@ extern "C" {
  */
 struct byte_fifo_t
 {
-    unsigned char* const data;
-    const unsigned int size;
-    unsigned int write_index;
-    unsigned int read_index;
-    unsigned int n_elements;
+    uint8_t* const data;
+    const uint32_t size;
+    uint32_t write_index;
+    uint32_t read_index;
+    uint32_t n_elements;
 };
 
 /**
@@ -62,15 +67,15 @@ struct byte_fifo_t
  *             - `fifo->size` must be greater than 0.
  *
  * @return 0 on success.
- * @return -EFAULT if `fifo` is NULL or `fifo->data` is NULL.
- * @return -EINVAL if `fifo->size` is 0.
+ * @return BYTE_FIFO_NULLPTR if `fifo` is NULL or `fifo->data` is NULL.
+ * @return BYTE_FIFO_INVALID_PARAM if `fifo->size` is 0.
  *
  * @note This function clears the memory buffer pointed to by `fifo->data`.
  *       Ensure the buffer is properly allocated before calling this function.
  * @note This function is not thread-safe. If used in a multi-threaded
  *       environment, appropriate locking mechanisms should be implemented.
  */
-int byte_fifo_init(struct byte_fifo_t* const fifo);
+int16_t byte_fifo_init(struct byte_fifo_t* const fifo);
 
 /**
  * @brief Resets the FIFO buffer.
@@ -81,13 +86,13 @@ int byte_fifo_init(struct byte_fifo_t* const fifo);
  * @param fifo Pointer to an instantiated `struct byte_fifo_t`.
  *
  * @return 0 on success.
- * @return -EFAULT if `fifo` is NULL or `fifo->data` is NULL.
- * @return -EINVAL if `fifo->size` is 0.
+ * @return BYTE_FIFO_EFAULT if `fifo` is NULL or `fifo->data` is NULL.
+ * @return BYTE_FIFO_EINVAL if `fifo->size` is 0.
  *
  * @note Use appropriate locking mechanisms in multi-threaded
  *       environments.
  */
-int byte_fifo_reset(struct byte_fifo_t* const fifo);
+int16_t byte_fifo_reset(struct byte_fifo_t* const fifo);
 
 /**
  * @brief Checks if the FIFO is empty.
@@ -98,11 +103,11 @@ int byte_fifo_reset(struct byte_fifo_t* const fifo);
  *
  * @return 1 if the FIFO is empty.
  * @return 0 if the FIFO is not empty.
- * @return -EFAULT if `fifo` is NULL.
+ * @return BYTE_FIFO_NULLPTR if `fifo` is NULL.
  *
  * @note This function does not modify the FIFO.
  */
-int byte_fifo_is_empty(const struct byte_fifo_t* const fifo);
+int16_t byte_fifo_is_empty(const struct byte_fifo_t* const fifo);
 
 /**
  * @brief Checks if the FIFO is full.
@@ -113,11 +118,11 @@ int byte_fifo_is_empty(const struct byte_fifo_t* const fifo);
  *
  * @return 1 if the FIFO is full.
  * @return 0 if the FIFO is not full.
- * @return -EFAULT if `fifo` is NULL.
+ * @return BYTE_FIFO_NULLPTR if `fifo` is NULL.
  *
  * @note This function does not modify the FIFO.
  */
-int byte_fifo_is_full(const struct byte_fifo_t* const fifo);
+int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo);
 
 /**
  * @brief Writes bytes to the FIFO until it is full or the source buffer is exhausted.
@@ -129,11 +134,11 @@ int byte_fifo_is_full(const struct byte_fifo_t* const fifo);
  * @param src Pointer to the source buffer.
  * @param len Length of the source buffer.
  *
- * @return -EFAULT if any provided pointer is NULL.
+ * @return BYTE_FIFO_NULLPTR if any provided pointer is NULL.
  * @return The number of bytes successfully written to the FIFO. A return value
  *         of 0 indicates that no bytes could be written.
  */
-int byte_fifo_write(struct byte_fifo_t* const fifo,
+int16_t byte_fifo_write(struct byte_fifo_t* const fifo,
                     const unsigned char* const src,
                     unsigned int len);
 
@@ -147,13 +152,13 @@ int byte_fifo_write(struct byte_fifo_t* const fifo,
  * @param src Pointer to the source buffer.
  * @param len Length of the source buffer.
  *
- * @return -EFAULT if any provided pointer is NULL.
+ * @return BYTE_FIFO_NULLPTR if any provided pointer is NULL.
  * @return The number of bytes that were overwritten in the FIFO. A return value
  *         of 0 indicates that all source bytes were written without overwriting.
  */
-int byte_fifo_overwrite(struct byte_fifo_t* const fifo,
-                        const unsigned char* const src,
-                        unsigned int len);
+int16_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
+                        const uint8_t* const src,
+                        uint32_t len);
 
 /**
  * @brief Reads bytes from the FIFO into a destination buffer.
@@ -165,14 +170,14 @@ int byte_fifo_overwrite(struct byte_fifo_t* const fifo,
  * @param dest Pointer to the destination buffer.
  * @param len Length of the destination buffer (must be positive).
  *
- * @return -EFAULT if any provided pointer is NULL.
- * @return -EINVAL if `len` is negative.
+ * @return BYTE_FIFO_NULLPTR if any provided pointer is NULL.
+ * @return BYTE_FIFO_INVALID_PARAM if `len` is negative.
  * @return The number of bytes successfully read from the FIFO. A return value
  *         of 0 indicates that the FIFO is empty.
  */
-int byte_fifo_read(struct byte_fifo_t* const fifo,
-                   unsigned char* const dest,
-                   int len);
+int16_t byte_fifo_read(struct byte_fifo_t* const fifo,
+                   uint8_t* const dest,
+                   int32_t len);
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
