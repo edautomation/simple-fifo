@@ -114,6 +114,7 @@ int16_t byte_fifo_read(struct byte_fifo_t* const fifo, uint8_t* const dest, int1
     {
         if (fifo->n_elements > 0)
         {
+            uint16_t read_index = fifo->read_index;
             dest[n_bytes_read] = fifo->data[read_index];
             fifo->read_index = (read_index < (fifo->size - 1)) ? read_index + 1 : 0;
             fifo->n_elements--;
