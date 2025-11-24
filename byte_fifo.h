@@ -50,10 +50,10 @@ extern "C" {
 struct byte_fifo_t
 {
     uint8_t* const data;
-    const uint32_t size;
-    uint32_t write_index;
-    uint32_t read_index;
-    uint32_t n_elements;
+    const uint16_t size;
+    uint16_t write_index;
+    uint16_t read_index;
+    uint16_t n_elements;
 };
 
 /**
@@ -87,7 +87,7 @@ int16_t byte_fifo_init(struct byte_fifo_t* const fifo);
  *
  * @return 0 on success.
  * @return BYTE_FIFO_EFAULT if `fifo` is NULL or `fifo->data` is NULL.
- * @return BYTE_FIFO_EINVAL if `fifo->size` is 0.
+ * @return BYTE_FIFO_INVALID_PARAM if `fifo->size` is 0.
  *
  * @note Use appropriate locking mechanisms in multi-threaded
  *       environments.
@@ -139,8 +139,8 @@ int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo);
  *         of 0 indicates that no bytes could be written.
  */
 int16_t byte_fifo_write(struct byte_fifo_t* const fifo,
-                    const unsigned char* const src,
-                    unsigned int len);
+                    const uint8_t* const src,
+                    uint16_t len);
 
 /**
  * @brief Writes bytes to the FIFO and overwrites existing data if the FIFO is full.
@@ -158,7 +158,7 @@ int16_t byte_fifo_write(struct byte_fifo_t* const fifo,
  */
 int16_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
                         const uint8_t* const src,
-                        uint32_t len);
+                        uint16_t len);
 
 /**
  * @brief Reads bytes from the FIFO into a destination buffer.
@@ -177,7 +177,7 @@ int16_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
  */
 int16_t byte_fifo_read(struct byte_fifo_t* const fifo,
                    uint8_t* const dest,
-                   int32_t len);
+                   int16_t len);
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
