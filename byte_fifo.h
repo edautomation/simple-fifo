@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#define BYTE_FIFO_NULLPTR -1
+#define BYTE_FIFO_NULLPTR       -1
 #define BYTE_FIFO_INVALID_PARAM -2
 
 #ifdef __cplusplus
@@ -86,7 +86,7 @@ int16_t byte_fifo_init(struct byte_fifo_t* const fifo);
  * @param fifo Pointer to an instantiated `struct byte_fifo_t`.
  *
  * @return 0 on success.
- * @return BYTE_FIFO_EFAULT if `fifo` is NULL or `fifo->data` is NULL.
+ * @return BYTE_FIFO_NULLPTR if `fifo` is NULL or `fifo->data` is NULL.
  * @return BYTE_FIFO_INVALID_PARAM if `fifo->size` is 0.
  *
  * @note Use appropriate locking mechanisms in multi-threaded
@@ -138,9 +138,9 @@ int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo);
  * @return The number of bytes successfully written to the FIFO. A return value
  *         of 0 indicates that no bytes could be written.
  */
-int16_t byte_fifo_write(struct byte_fifo_t* const fifo,
-                    const uint8_t* const src,
-                    uint16_t len);
+int32_t byte_fifo_write(struct byte_fifo_t* const fifo,
+                        const uint8_t* const src,
+                        uint16_t len);
 
 /**
  * @brief Writes bytes to the FIFO and overwrites existing data if the FIFO is full.
@@ -156,9 +156,9 @@ int16_t byte_fifo_write(struct byte_fifo_t* const fifo,
  * @return The number of bytes that were overwritten in the FIFO. A return value
  *         of 0 indicates that all source bytes were written without overwriting.
  */
-int16_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
-                        const uint8_t* const src,
-                        uint16_t len);
+int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
+                            const uint8_t* const src,
+                            uint16_t len);
 
 /**
  * @brief Reads bytes from the FIFO into a destination buffer.
@@ -175,9 +175,9 @@ int16_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
  * @return The number of bytes successfully read from the FIFO. A return value
  *         of 0 indicates that the FIFO is empty.
  */
-int16_t byte_fifo_read(struct byte_fifo_t* const fifo,
-                   uint8_t* const dest,
-                   int16_t len);
+int32_t byte_fifo_read(struct byte_fifo_t* const fifo,
+                       uint8_t* const dest,
+                       int16_t len);
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

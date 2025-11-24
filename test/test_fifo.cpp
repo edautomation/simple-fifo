@@ -1,4 +1,3 @@
-#include <errno.h>  // EFAULT, EINVAL
 #include <gtest/gtest.h>
 #include <cstdint>
 #include <cstring>  // For memset
