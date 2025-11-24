@@ -168,7 +168,7 @@ int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
  *
  * @param fifo Pointer to an initialized FIFO, see `byte_fifo_init`.
  * @param dest Pointer to the destination buffer.
- * @param len Length of the destination buffer (must be positive).
+ * @param len Length of the destination buffer (must be non-negative).
  *
  * @return BYTE_FIFO_NULLPTR if any provided pointer is NULL.
  * @return BYTE_FIFO_INVALID_PARAM if `len` is negative.
