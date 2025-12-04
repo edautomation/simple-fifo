@@ -96,6 +96,40 @@ static inline bf_err_t byte_fifo_get_error(bf_res_t res)
 }
 
 /**
+ * @brief Converts an error code into a human-readable string.
+ *
+ * This function takes an error code of type `bf_err_t` and returns a
+ * corresponding string that describes the error. It is useful for debugging
+ * and logging purposes.
+ *
+ * @param err The error code to convert.
+ *
+ * @return A constant string describing the error:
+ *
+ * @note This function does not modify any state and is safe to call in
+ *       multi-threaded environments.
+ */
+static inline const char* byte_fifo_strerror(bf_err_t err)
+{
+    if (err > 0)
+    {
+        return "No error";
+    }
+
+    switch (err)
+    {
+        case BF_ERR_OK:
+            return "No error";
+        case BF_ERR_NULLPTR:
+            return "Null pointer error";
+        case BF_ERR_INVAL:
+            return "Invalid argument error";
+        default:
+            return "Unknown error";
+    }
+}
+
+/**
  * @brief Initializes a byte FIFO (First-In-First-Out) buffer.
  *
  * This function sets up the FIFO structure by resetting its indices,

@@ -37,6 +37,7 @@ Depending on your platform, run the executable from different places.
 ```c
 #include "byte_fifo.h" 
 #include <stdio.h>
+#include <stdint.h>
 
 #define BUFFER_SIZE 128
 
@@ -44,7 +45,7 @@ int main()
 { 
 
     // Allocate a buffer for the FIFO
-    unsigned char buffer[BUFFER_SIZE]; 
+    uint8_t buffer[BUFFER_SIZE]; 
     
     // Create and initialize the FIFO structure
     struct byte_fifo_t fifo = { 
@@ -52,30 +53,54 @@ int main()
         .size = BUFFER_SIZE,
         };
     
-    if (byte_fifo_init(&fifo) != 0) 
+    bf_err_t sts = byte_fifo_init(&fifo);
+    if (BF_ERR_OK != sts) 
     {
-        printf("Failed to initialize FIFO.\n");
+        printf("Failed to initialize FIFO: %s.\n", byte_fifo_strerror(sts));
         return -1;
     }
     
     // Write data to the FIFO
-    unsigned char data_to_write[] = { 1, 2, 3, 4, 5 };
-    int bytes_written = byte_fifo_write(&fifo, data_to_write, sizeof(data_to_write));
-    printf("Bytes written to FIFO: %d\n", bytes_written);
+    uint8_t data_to_write[] = { 1, 2, 3, 4, 5 };
+    bf_res_t bytes_written = byte_fifo_write(&fifo, data_to_write, sizeof(data_to_write));
+    if (byte_fifo_get_error(bytes_written) != BF_ERR_OK)
+    {
+        printf("Error writing bytes to FIFO: %s\n", byte_fifo_strerror(bytes_written));
+        return -1;
+    }
+    else
+    {
+        printf("Bytes written to FIFO: %d\n", bytes_written);
+    }
     
     // Check if the FIFO is full
-    if (byte_fifo_is_full(&fifo)) 
+    bf_res_t is_full = byte_fifo_is_full(&fifo);
+    if (byte_fifo_get_error(is_full) != BF_ERR_OK)
+    {
+        printf("Error getting byte fifo status: %s\n", byte_fifo_strerror(is_full));
+        return -1;
+    }
+    else if (is_full)
     {
         printf("FIFO is full.\n");
-    } else 
+    } 
+    else 
     {
         printf("FIFO is not full.\n");
     }
     
     // Read data from the FIFO
-    unsigned char data_read[5];
-    int bytes_read = byte_fifo_read(&fifo, data_read, sizeof(data_read));
-    printf("Bytes read from FIFO: %d\n", bytes_read);
+    uint8_t data_read[5];
+    bf_rest_t bytes_read = byte_fifo_read(&fifo, data_read, sizeof(data_read));
+    if (byte_fifo_get_error(bytes_read) != BF_ERR_OK)
+    {
+        printf("Error reading bytes to FIFO: %s\n", byte_fifo_strerror(bytes_read));
+        return -1;
+    }
+    else
+    {
+        printf("Bytes read from FIFO: %d\n", bytes_read);
+    }
     
     // Print the data read
     printf("Data read from FIFO: ");
@@ -86,10 +111,17 @@ int main()
     printf("\n");
     
     // Check if the FIFO is empty
-    if (byte_fifo_is_empty(&fifo)) 
+    bf_res_t is_empty = byte_fifo_is_empty(&fifo);
+    if (byte_fifo_get_error(is_empty) != BF_ERR_OK)
+    {
+        printf("Error getting byte fifo status: %s\n", byte_fifo_strerror(is_empty));
+        return -1;
+    }
+    else if (is_empty)
     {
         printf("FIFO is empty.\n");
-    } else 
+    } 
+    else 
     {
         printf("FIFO is not empty.\n");
     }
