@@ -1,19 +1,15 @@
 #include "byte_fifo.h"
 
-#ifdef __KERNEL__
-#include <linux/string.h>  // memset
-#else
 #include <string.h>  // memset
-#endif
 
 #define RETURN_IF(x, y) \
     if ((x)) return (y)
 
-int16_t byte_fifo_init(struct byte_fifo_t* const fifo)
+bf_err_t byte_fifo_init(struct byte_fifo_t* const fifo)
 {
-    RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
-    RETURN_IF(NULL == fifo->data, BYTE_FIFO_NULLPTR);
-    RETURN_IF(0 == fifo->size, BYTE_FIFO_INVALID_PARAM);
+    RETURN_IF(NULL == fifo, BF_ERR_NULLPTR);
+    RETURN_IF(NULL == fifo->data, BF_ERR_NULLPTR);
+    RETURN_IF(0 == fifo->size, BF_ERR_INVAL);
 
     fifo->write_index = 0U;
     fifo->read_index = 0U;
@@ -24,31 +20,32 @@ int16_t byte_fifo_init(struct byte_fifo_t* const fifo)
     return 0;
 }
 
-int16_t byte_fifo_reset(struct byte_fifo_t* const fifo)
+bf_err_t byte_fifo_reset(struct byte_fifo_t* const fifo)
 {
     return byte_fifo_init(fifo);
 }
 
-int16_t byte_fifo_is_empty(const struct byte_fifo_t* const fifo)
+bf_res_t byte_fifo_is_empty(const struct byte_fifo_t* const fifo)
 {
-    RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
+    RETURN_IF(NULL == fifo, BF_ERR_NULLPTR);
     return (fifo->n_elements == 0);
 }
 
-int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo)
+bf_res_t byte_fifo_is_full(const struct byte_fifo_t* const fifo)
 {
-    RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
+    RETURN_IF(NULL == fifo, BF_ERR_NULLPTR);
     return (fifo->n_elements == fifo->size);
 }
 
-int32_t byte_fifo_write(struct byte_fifo_t* const fifo, const uint8_t* const src, uint16_t len)
+bf_res_t byte_fifo_write(struct byte_fifo_t* const fifo, const uint8_t* const src, uint16_t len)
 {
-    RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
-    RETURN_IF(NULL == fifo->data, BYTE_FIFO_NULLPTR);
-    RETURN_IF(NULL == src, BYTE_FIFO_NULLPTR);
+    RETURN_IF(NULL == fifo, BF_ERR_NULLPTR);
+    RETURN_IF(NULL == fifo->data, BF_ERR_NULLPTR);
+    RETURN_IF(NULL == src, BF_ERR_NULLPTR);
 
     int32_t n_bytes_written = 0;
-    while (len > 0)
+    int32_t n_bytes_to_write = (int32_t)len;
+    while (n_bytes_written < n_bytes_to_write)
     {
         if (fifo->n_elements < fifo->size)
         {
@@ -59,7 +56,6 @@ int32_t byte_fifo_write(struct byte_fifo_t* const fifo, const uint8_t* const src
 
             // Update
             n_bytes_written++;
-            len--;
         }
         else
         {
@@ -71,15 +67,16 @@ int32_t byte_fifo_write(struct byte_fifo_t* const fifo, const uint8_t* const src
     return n_bytes_written;
 }
 
-int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo, const uint8_t* const src, uint16_t len)
+bf_res_t byte_fifo_overwrite(struct byte_fifo_t* const fifo, const uint8_t* const src, uint16_t len)
 {
-    RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
-    RETURN_IF(NULL == fifo->data, BYTE_FIFO_NULLPTR);
-    RETURN_IF(NULL == src, BYTE_FIFO_NULLPTR);
+    RETURN_IF(NULL == fifo, BF_ERR_NULLPTR);
+    RETURN_IF(NULL == fifo->data, BF_ERR_NULLPTR);
+    RETURN_IF(NULL == src, BF_ERR_NULLPTR);
 
     int32_t n_bytes_written = 0;
     int32_t n_bytes_overwritten = 0;
-    while (len > 0)
+    int32_t n_bytes_to_write = (int32_t)len;
+    while (n_bytes_to_write > 0)
     {
         uint16_t write_index = fifo->write_index;
         fifo->data[write_index] = src[n_bytes_written + n_bytes_overwritten];
@@ -96,21 +93,21 @@ int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo, const uint8_t* const
             fifo->read_index = (read_index < (fifo->size - 1)) ? read_index + 1 : 0;
             n_bytes_overwritten++;
         }
-        len--;
+        n_bytes_to_write--;
     }
 
     return n_bytes_overwritten;
 }
 
-int32_t byte_fifo_read(struct byte_fifo_t* const fifo, uint8_t* const dest, int16_t len)
+bf_res_t byte_fifo_read(struct byte_fifo_t* const fifo, uint8_t* const dest, uint16_t len)
 {
-    RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
-    RETURN_IF(NULL == fifo->data, BYTE_FIFO_NULLPTR);
-    RETURN_IF(NULL == dest, BYTE_FIFO_NULLPTR);
-    RETURN_IF(len < 0, BYTE_FIFO_INVALID_PARAM);
+    RETURN_IF(NULL == fifo, BF_ERR_NULLPTR);
+    RETURN_IF(NULL == fifo->data, BF_ERR_NULLPTR);
+    RETURN_IF(NULL == dest, BF_ERR_NULLPTR);
 
+    int32_t n_bytes_to_read = (int32_t)len;
     int32_t n_bytes_read = 0;
-    while (n_bytes_read < len)
+    while (n_bytes_read < n_bytes_to_read)
     {
         if (fifo->n_elements > 0)
         {

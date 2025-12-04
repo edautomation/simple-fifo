@@ -39,19 +39,19 @@ TEST_F(ByteFifoTest, Init)
 
 TEST_F(ByteFifoTest, InitNull)
 {
-    EXPECT_EQ(byte_fifo_init(nullptr), BYTE_FIFO_NULLPTR);
+    EXPECT_EQ(byte_fifo_init(nullptr), BF_ERR_NULLPTR);
 }
 
 TEST_F(ByteFifoTest, InitNullData)
 {
     byte_fifo_t null_data_fifo = {nullptr, kFifoSize, 0, 0, 0};
-    EXPECT_EQ(byte_fifo_init(&null_data_fifo), BYTE_FIFO_NULLPTR);
+    EXPECT_EQ(byte_fifo_init(&null_data_fifo), BF_ERR_NULLPTR);
 }
 
 TEST_F(ByteFifoTest, InitZeroSize)
 {
     byte_fifo_t zero_size_fifo = {buffer_, 0, 0, 0, 0};
-    EXPECT_EQ(byte_fifo_init(&zero_size_fifo), BYTE_FIFO_INVALID_PARAM);
+    EXPECT_EQ(byte_fifo_init(&zero_size_fifo), BF_ERR_INVAL);
 }
 
 TEST_F(ByteFifoTest, InitReset)
@@ -66,7 +66,7 @@ TEST_F(ByteFifoTest, InitReset)
 
 TEST_F(ByteFifoTest, IsEmpty)
 {
-    EXPECT_EQ(byte_fifo_is_empty(nullptr), BYTE_FIFO_NULLPTR);
+    EXPECT_EQ(byte_fifo_is_empty(nullptr), BF_ERR_NULLPTR);
     EXPECT_EQ(byte_fifo_is_empty(fifo_), 1);
     uint8_t data[] = {1};
     byte_fifo_write(fifo_, data, 1);
@@ -75,7 +75,7 @@ TEST_F(ByteFifoTest, IsEmpty)
 
 TEST_F(ByteFifoTest, IsFull)
 {
-    EXPECT_EQ(byte_fifo_is_full(nullptr), BYTE_FIFO_NULLPTR);
+    EXPECT_EQ(byte_fifo_is_full(nullptr), BF_ERR_NULLPTR);
     uint8_t data[kFifoSize];
     memset(data, 1, kFifoSize);
     EXPECT_EQ(byte_fifo_write(fifo_, data, kFifoSize), kFifoSize);
@@ -110,10 +110,23 @@ TEST_F(ByteFifoTest, Overwrite)
 TEST_F(ByteFifoTest, NullPointer)
 {
     uint8_t data[] = {1, 2};
-    EXPECT_EQ(byte_fifo_write(nullptr, data, 2), BYTE_FIFO_NULLPTR);
-    EXPECT_EQ(byte_fifo_write(fifo_, nullptr, 2), BYTE_FIFO_NULLPTR);
-    EXPECT_EQ(byte_fifo_read(nullptr, data, 2), BYTE_FIFO_NULLPTR);
-    EXPECT_EQ(byte_fifo_read(fifo_, nullptr, 2), BYTE_FIFO_NULLPTR);
+    EXPECT_EQ(byte_fifo_write(nullptr, data, 2), BF_ERR_NULLPTR);
+    EXPECT_EQ(byte_fifo_write(fifo_, nullptr, 2), BF_ERR_NULLPTR);
+    EXPECT_EQ(byte_fifo_read(nullptr, data, 2), BF_ERR_NULLPTR);
+    EXPECT_EQ(byte_fifo_read(fifo_, nullptr, 2), BF_ERR_NULLPTR);
+}
+
+TEST_F(ByteFifoTest, CheckErrorCode)
+{
+    EXPECT_EQ(BF_ERR_OK, byte_fifo_get_error(0));
+    EXPECT_EQ(BF_ERR_OK, byte_fifo_get_error(1));
+    EXPECT_EQ(BF_ERR_OK, byte_fifo_get_error(42));
+    EXPECT_EQ(BF_ERR_OK, byte_fifo_get_error(INT32_MAX));
+    EXPECT_EQ(BF_ERR_OK, byte_fifo_get_error(INT32_MAX - 1));
+    EXPECT_EQ(-1, byte_fifo_get_error(-1));
+    EXPECT_EQ(-42, byte_fifo_get_error(-42));
+    EXPECT_EQ(-INT32_MIN + 1, byte_fifo_get_error(-INT32_MIN + 1));
+    EXPECT_EQ(-INT32_MIN, byte_fifo_get_error(-INT32_MIN));
 }
 
 int main(int argc, char** argv)

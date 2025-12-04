@@ -18,10 +18,12 @@
 #ifndef BYTE_FIFO_H_
 #define BYTE_FIFO_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
-#define BYTE_FIFO_NULLPTR       -1
-#define BYTE_FIFO_INVALID_PARAM -2
+#define BF_ERR_OK      0
+#define BF_ERR_NULLPTR (-1)
+#define BF_ERR_INVAL   (-2)
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +59,44 @@ struct byte_fifo_t
 };
 
 /**
+ * @brief Type definition for error codes used in the FIFO API.
+ *
+ * This type is used to represent error codes returned by the FIFO functions.
+ * Error codes are negative values, with `BF_ERR_OK` (0) indicating success.
+ *
+ * Common usage: when no information other than success or failure is returned.
+ */
+typedef int32_t bf_err_t;
+
+/**
+ * @brief Type definition for result values used in the FIFO API.
+ *
+ * This type is used to represent the result of FIFO operations. Positive
+ * values indicate the number of bytes successfully processed, while negative
+ * values represent error codes.
+ *
+ * Common usage: when functions return either a value or an error code.
+ */
+typedef int32_t bf_res_t;
+
+/**
+ * @brief Extracts the error code from a result value.
+ *
+ * This function checks the result value and determines if it represents an error.
+ *
+ * @param res The result value to check. *
+ * @return The extracted error code:
+ *         - `BF_ERR_OK` if the result value is non-negative.
+ *         - The negative result value if it represents an error.
+ *
+ * @note This function is a utility to simplify error handling in the FIFO API.
+ */
+static inline bf_err_t byte_fifo_get_error(bf_res_t res)
+{
+    return (res < 0) ? res : BF_ERR_OK;
+}
+
+/**
  * @brief Initializes a byte FIFO (First-In-First-Out) buffer.
  *
  * This function sets up the FIFO structure by resetting its indices,
@@ -66,16 +106,16 @@ struct byte_fifo_t
  *             - `fifo->data` must point to a valid memory buffer.
  *             - `fifo->size` must be greater than 0.
  *
- * @return 0 on success.
- * @return BYTE_FIFO_NULLPTR if `fifo` is NULL or `fifo->data` is NULL.
- * @return BYTE_FIFO_INVALID_PARAM if `fifo->size` is 0.
+ * @return BF_ERR_OK on success.
+ * @return BF_ERR_NULLPTR if `fifo` is NULL or `fifo->data` is NULL.
+ * @return BF_ERR_INVAL if `fifo->size` is 0.
  *
  * @note This function clears the memory buffer pointed to by `fifo->data`.
  *       Ensure the buffer is properly allocated before calling this function.
  * @note This function is not thread-safe. If used in a multi-threaded
  *       environment, appropriate locking mechanisms should be implemented.
  */
-int16_t byte_fifo_init(struct byte_fifo_t* const fifo);
+bf_err_t byte_fifo_init(struct byte_fifo_t* const fifo);
 
 /**
  * @brief Resets the FIFO buffer.
@@ -85,14 +125,14 @@ int16_t byte_fifo_init(struct byte_fifo_t* const fifo);
  *
  * @param fifo Pointer to an instantiated `struct byte_fifo_t`.
  *
- * @return 0 on success.
- * @return BYTE_FIFO_NULLPTR if `fifo` is NULL or `fifo->data` is NULL.
- * @return BYTE_FIFO_INVALID_PARAM if `fifo->size` is 0.
+ * @return BF_ERR_OK on success.
+ * @return BF_ERR_NULLPTR if `fifo` is NULL or `fifo->data` is NULL.
+ * @return BF_ERR_INVAL if `fifo->size` is 0.
  *
  * @note Use appropriate locking mechanisms in multi-threaded
  *       environments.
  */
-int16_t byte_fifo_reset(struct byte_fifo_t* const fifo);
+bf_err_t byte_fifo_reset(struct byte_fifo_t* const fifo);
 
 /**
  * @brief Checks if the FIFO is empty.
@@ -103,11 +143,11 @@ int16_t byte_fifo_reset(struct byte_fifo_t* const fifo);
  *
  * @return 1 if the FIFO is empty.
  * @return 0 if the FIFO is not empty.
- * @return BYTE_FIFO_NULLPTR if `fifo` is NULL.
+ * @return BF_ERR_NULLPTR if `fifo` is NULL.
  *
  * @note This function does not modify the FIFO.
  */
-int16_t byte_fifo_is_empty(const struct byte_fifo_t* const fifo);
+bf_res_t byte_fifo_is_empty(const struct byte_fifo_t* const fifo);
 
 /**
  * @brief Checks if the FIFO is full.
@@ -118,11 +158,11 @@ int16_t byte_fifo_is_empty(const struct byte_fifo_t* const fifo);
  *
  * @return 1 if the FIFO is full.
  * @return 0 if the FIFO is not full.
- * @return BYTE_FIFO_NULLPTR if `fifo` is NULL.
+ * @return BF_ERR_NULLPTR if `fifo` is NULL.
  *
  * @note This function does not modify the FIFO.
  */
-int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo);
+bf_res_t byte_fifo_is_full(const struct byte_fifo_t* const fifo);
 
 /**
  * @brief Writes bytes to the FIFO until it is full or the source buffer is exhausted.
@@ -134,13 +174,13 @@ int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo);
  * @param src Pointer to the source buffer.
  * @param len Length of the source buffer.
  *
- * @return BYTE_FIFO_NULLPTR if any provided pointer is NULL.
+ * @return BF_ERR_NULLPTR if any provided pointer is NULL.
  * @return The number of bytes successfully written to the FIFO. A return value
  *         of 0 indicates that no bytes could be written.
  */
-int32_t byte_fifo_write(struct byte_fifo_t* const fifo,
-                        const uint8_t* const src,
-                        uint16_t len);
+bf_res_t byte_fifo_write(struct byte_fifo_t* const fifo,
+                         const uint8_t* const src,
+                         uint16_t len);
 
 /**
  * @brief Writes bytes to the FIFO and overwrites existing data if the FIFO is full.
@@ -152,13 +192,13 @@ int32_t byte_fifo_write(struct byte_fifo_t* const fifo,
  * @param src Pointer to the source buffer.
  * @param len Length of the source buffer.
  *
- * @return BYTE_FIFO_NULLPTR if any provided pointer is NULL.
+ * @return BF_ERR_NULLPTR if any provided pointer is NULL.
  * @return The number of bytes that were overwritten in the FIFO. A return value
  *         of 0 indicates that all source bytes were written without overwriting.
  */
-int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
-                            const uint8_t* const src,
-                            uint16_t len);
+bf_res_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
+                             const uint8_t* const src,
+                             uint16_t len);
 
 /**
  * @brief Reads bytes from the FIFO into a destination buffer.
@@ -170,14 +210,13 @@ int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
  * @param dest Pointer to the destination buffer.
  * @param len Length of the destination buffer (must be non-negative).
  *
- * @return BYTE_FIFO_NULLPTR if any provided pointer is NULL.
- * @return BYTE_FIFO_INVALID_PARAM if `len` is negative.
+ * @return BF_ERR_NULLPTR if any provided pointer is NULL.
  * @return The number of bytes successfully read from the FIFO. A return value
  *         of 0 indicates that the FIFO is empty.
  */
-int32_t byte_fifo_read(struct byte_fifo_t* const fifo,
-                       uint8_t* const dest,
-                       int16_t len);
+bf_res_t byte_fifo_read(struct byte_fifo_t* const fifo,
+                        uint8_t* const dest,
+                        uint16_t len);
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
