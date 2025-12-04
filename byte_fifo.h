@@ -18,7 +18,6 @@
 #ifndef BYTE_FIFO_H_
 #define BYTE_FIFO_H_
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #define BF_ERR_OK      0
