@@ -49,7 +49,7 @@ extern "C" {
  */
 struct byte_fifo_t
 {
-    uint8_t* const data;
+    uint_least8_t* const data;
     const uint16_t size;
     uint16_t write_index;
     uint16_t read_index;
@@ -139,7 +139,7 @@ int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo);
  *         of 0 indicates that no bytes could be written.
  */
 int32_t byte_fifo_write(struct byte_fifo_t* const fifo,
-                        const uint8_t* const src,
+                        const uint_least8_t* const src,
                         uint16_t len);
 
 /**
@@ -157,7 +157,7 @@ int32_t byte_fifo_write(struct byte_fifo_t* const fifo,
  *         of 0 indicates that all source bytes were written without overwriting.
  */
 int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
-                            const uint8_t* const src,
+                            const uint_least8_t* const src,
                             uint16_t len);
 
 /**
@@ -176,7 +176,7 @@ int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo,
  *         of 0 indicates that the FIFO is empty.
  */
 int32_t byte_fifo_read(struct byte_fifo_t* const fifo,
-                       uint8_t* const dest,
+                       uint_least8_t* const dest,
                        int16_t len);
 #ifdef __cplusplus
 }
