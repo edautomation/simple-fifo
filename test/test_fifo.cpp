@@ -11,7 +11,7 @@ class ByteFifoTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        buffer_ = new uint8_t[kFifoSize];
+        buffer_ = new uint_least8_t[kFifoSize];
         fifo_ = new byte_fifo_t{buffer_, kFifoSize, 0, 0, 0};
         byte_fifo_init(fifo_);
     }
@@ -22,7 +22,7 @@ class ByteFifoTest : public ::testing::Test
         delete fifo_;
     }
 
-    uint8_t* buffer_;
+    uint_least8_t* buffer_;
     byte_fifo_t* fifo_;
 };
 
@@ -68,7 +68,7 @@ TEST_F(ByteFifoTest, IsEmpty)
 {
     EXPECT_EQ(byte_fifo_is_empty(nullptr), BYTE_FIFO_NULLPTR);
     EXPECT_EQ(byte_fifo_is_empty(fifo_), 1);
-    uint8_t data[] = {1};
+    uint_least8_t data[] = {1};
     byte_fifo_write(fifo_, data, 1);
     EXPECT_EQ(byte_fifo_is_empty(fifo_), 0);
 }
@@ -76,7 +76,7 @@ TEST_F(ByteFifoTest, IsEmpty)
 TEST_F(ByteFifoTest, IsFull)
 {
     EXPECT_EQ(byte_fifo_is_full(nullptr), BYTE_FIFO_NULLPTR);
-    uint8_t data[kFifoSize];
+    uint_least8_t data[kFifoSize];
     memset(data, 1, kFifoSize);
     EXPECT_EQ(byte_fifo_write(fifo_, data, kFifoSize), kFifoSize);
     EXPECT_EQ(byte_fifo_is_full(fifo_), 1);
@@ -84,32 +84,32 @@ TEST_F(ByteFifoTest, IsFull)
 
 TEST_F(ByteFifoTest, WriteRead)
 {
-    uint8_t data[] = {1, 2, 3};
+    uint_least8_t data[] = {1, 2, 3};
     EXPECT_EQ(byte_fifo_write(fifo_, data, 3), 3);
 
-    uint8_t read_data[3];
+    uint_least8_t read_data[3];
     EXPECT_EQ(byte_fifo_read(fifo_, read_data, 3), 3);
     EXPECT_EQ(memcmp(data, read_data, 3), 0);
 }
 
 TEST_F(ByteFifoTest, Overwrite)
 {
-    uint8_t data1[kFifoSize];
+    uint_least8_t data1[kFifoSize];
     memset(data1, 1, kFifoSize);
-    uint8_t data2[] = {2, 3};
+    uint_least8_t data2[] = {2, 3};
 
     EXPECT_EQ(byte_fifo_write(fifo_, data1, kFifoSize), kFifoSize);
     EXPECT_EQ(byte_fifo_overwrite(fifo_, data2, 2), 2);
 
-    uint8_t read_data[2];
-    uint8_t expected_read_data[] = {1, 1};
+    uint_least8_t read_data[2];
+    uint_least8_t expected_read_data[] = {1, 1};
     EXPECT_EQ(byte_fifo_read(fifo_, read_data, 2), 2);
     EXPECT_EQ(memcmp(expected_read_data, read_data, 2), 0);
 }
 
 TEST_F(ByteFifoTest, NullPointer)
 {
-    uint8_t data[] = {1, 2};
+    uint_least8_t data[] = {1, 2};
     EXPECT_EQ(byte_fifo_write(nullptr, data, 2), BYTE_FIFO_NULLPTR);
     EXPECT_EQ(byte_fifo_write(fifo_, nullptr, 2), BYTE_FIFO_NULLPTR);
     EXPECT_EQ(byte_fifo_read(nullptr, data, 2), BYTE_FIFO_NULLPTR);

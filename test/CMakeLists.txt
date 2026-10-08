@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 
 project(tests VERSION 1.0)
 
+enable_testing()
+
 
 add_executable(tests test_fifo.cpp)
 

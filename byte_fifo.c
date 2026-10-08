@@ -41,7 +41,7 @@ int16_t byte_fifo_is_full(const struct byte_fifo_t* const fifo)
     return (fifo->n_elements == fifo->size);
 }
 
-int32_t byte_fifo_write(struct byte_fifo_t* const fifo, const uint8_t* const src, uint16_t len)
+int32_t byte_fifo_write(struct byte_fifo_t* const fifo, const uint_least8_t* const src, uint16_t len)
 {
     RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
     RETURN_IF(NULL == fifo->data, BYTE_FIFO_NULLPTR);
@@ -71,7 +71,7 @@ int32_t byte_fifo_write(struct byte_fifo_t* const fifo, const uint8_t* const src
     return n_bytes_written;
 }
 
-int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo, const uint8_t* const src, uint16_t len)
+int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo, const uint_least8_t* const src, uint16_t len)
 {
     RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
     RETURN_IF(NULL == fifo->data, BYTE_FIFO_NULLPTR);
@@ -102,7 +102,7 @@ int32_t byte_fifo_overwrite(struct byte_fifo_t* const fifo, const uint8_t* const
     return n_bytes_overwritten;
 }
 
-int32_t byte_fifo_read(struct byte_fifo_t* const fifo, uint8_t* const dest, int16_t len)
+int32_t byte_fifo_read(struct byte_fifo_t* const fifo, uint_least8_t* const dest, int16_t len)
 {
     RETURN_IF(NULL == fifo, BYTE_FIFO_NULLPTR);
     RETURN_IF(NULL == fifo->data, BYTE_FIFO_NULLPTR);
